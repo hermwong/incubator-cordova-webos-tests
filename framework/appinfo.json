@@ -1,10 +1,10 @@
 {
-	"id": "com.cordova.webos",
+	"id": "com.cordova.webos.tests",
 	"version": "0.0.1",
 	"vendor": "Palm",
 	"type": "web",
 	"main": "index.html",
-	"title": "Cordova WebOS",
+	"title": "Cordova WebOS Tests",
 	"icon": "cordova_48.png",
 	"uiRevision": 2
 }
