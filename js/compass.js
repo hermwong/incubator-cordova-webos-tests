@@ -1,4 +1,25 @@
 /*
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+*/
+
+/*
  * This class provides access to device compass data.
  * @constructor
  */
@@ -6,7 +27,7 @@ function Compass() {
   /*
 	 * The last known heading.
 	 */
-	this.lastHeading = null;
+	this.lastHeading = null;//new CompassHeading;
 };
 
 /*
@@ -22,6 +43,8 @@ function Compass() {
 Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, options) {
 
     var referenceTime = 0;
+	var compassHeading = new CompassHeading();
+
     if (this.lastHeading)
         referenceTime = this.lastHeading.timestamp;
     else
@@ -44,7 +67,19 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
  
 		//if we have a new compass heading, call success and cancel the timer
         if (typeof(dis.lastHeading) == 'object' && dis.lastHeading != null && dis.lastHeading.timestamp > referenceTime) {
-            successCallback(dis.lastHeading.magHeading);
+
+			compassHeading.timestamp = new Date(referenceTime);
+			compassHeading.magneticHeading = dis.lastHeading.magHeading;
+			compassHeading.trueHeading = dis.lastHeading.trueHeading;
+			
+			if (dis.lastHeading.headingAccuracy === undefined)
+				compassHeading.headingAccuracy = 1;
+			else
+				compassHeading.headingAccuracy = dis.lastHeading.headingAccuracy;
+
+			successCallback(compassHeading);
+
+            //successCallback(dis.lastHeading.magHeading);
             clearInterval(timer);
         } else if (delay >= timeout) { //else if timeout has occured then call error and cancel the timer
             errorCallback();
@@ -98,5 +133,35 @@ Compass.prototype.start = function() {
 		that.lastHeading = heading;
 	});
 };
+
+function CompassHeading(mHeading, tHeading, accuracy, time) {
+	if (mHeading === undefined)
+		this.magneticHeading = null;
+	else
+		this.magneticHeading = mHeading;
+		
+	if (tHeading === undefined)
+		this.trueHeading = null;
+	else
+		this.trueHeading = tHeading;
+		
+	if (accuracy === undefined)	
+		this.headingAccuracy = null;
+	else
+		this.headingAccuracy = accuracy;
+		
+	if (time === undefined)	
+		this.timestamp = new Date();
+	else
+		this.timestamp = new Date(time);
+};
+
+function CompassError() {
+	this.code = null;
+	this.message = "";	
+};
+
+CompassError.COMPASS_INTERNAL_ERR = 0;
+CompassError.COMPASS_NOT_SUPPORTED = 20;
 
 if (typeof navigator.compass == "undefined") navigator.compass = new Compass();

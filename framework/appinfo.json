@@ -1,7 +1,7 @@
 {
-	"id": "com.cordova.webos.tests",
+	"id": "org.apache.cordova.webos.tests",
 	"version": "0.0.1",
-	"vendor": "Palm",
+	"vendor": "HP",
 	"type": "web",
 	"main": "index.html",
 	"title": "Cordova WebOS Tests",
